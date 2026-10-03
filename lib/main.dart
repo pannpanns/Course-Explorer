@@ -14,96 +14,70 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: LayoutBuilderPage(),
+      home: ExpandedWrapPage(),
     );
   }
 }
 
-class LayoutBuilderPage extends StatelessWidget {
-  const LayoutBuilderPage({super.key});
+class ExpandedWrapPage extends StatelessWidget {
+  const ExpandedWrapPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final List<String> skills = [
+      'Flutter', 'Dart', 'Firebase', 'Git', 'UI/UX', 'REST API', 'JSON'
+    ];
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Tahap 3: LayoutBuilder')),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          if (constraints.maxWidth < 600) {
-            return const CompactLayout();
-          } else if (constraints.maxWidth < 840) {
-            return const MediumLayout();
-          } else {
-            return const ExpandedLayout();
-          }
-        },
-      ),
-    );
-  }
-}
+      appBar: AppBar(title: const Text('Tahap 4: Expanded & Wrap')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              '$studentId - $studentName',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
 
-class CompactLayout extends StatelessWidget {
-  const CompactLayout({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.red[100],
-      width: double.infinity,
-      child: const Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text('$studentId - $studentName', style: TextStyle(fontWeight: FontWeight.bold)),
-          SizedBox(height: 10),
-          Text('Compact Layout', style: TextStyle(fontSize: 24, color: Colors.red)),
-          Icon(Icons.smartphone, size: 64, color: Colors.red),
-        ],
-      ),
-    );
-  }
-}
+            const Text('Expanded Layout (Flex 2:1):', style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Container(
+                    height: 80,
+                    color: Colors.blue[300],
+                    alignment: Alignment.center,
+                    child: const Text('Flex: 2', style: TextStyle(fontSize: 18, color: Colors.white)),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  flex: 1, // Mengambil 1 bagian ruang
+                  child: Container(
+                    height: 80,
+                    color: Colors.orange[300],
+                    alignment: Alignment.center,
+                    child: const Text('Flex: 1', style: TextStyle(fontSize: 18, color: Colors.white)),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 30),
 
-// 2. Tampilan Medium (Tablet Kecil / Landscape Phone)
-class MediumLayout extends StatelessWidget {
-  const MediumLayout({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.orange[100],
-      width: double.infinity,
-      child: const Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text('$studentId - $studentName', style: TextStyle(fontWeight: FontWeight.bold)),
-          SizedBox(height: 10),
-          Text('Medium Layout', style: TextStyle(fontSize: 28, color: Colors.orange)),
-          Icon(Icons.tablet_mac, size: 80, color: Colors.orange),
-        ],
-      ),
-    );
-  }
-}
-
-// 3. Tampilan Expanded (Desktop / Tablet Besar)
-class ExpandedLayout extends StatelessWidget {
-  const ExpandedLayout({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.green[100],
-      width: double.infinity,
-      child: const Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.desktop_windows, size: 100, color: Colors.green),
-          SizedBox(width: 20),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('$studentId - $studentName', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-              Text('Expanded Layout', style: TextStyle(fontSize: 32, color: Colors.green)),
-            ],
-          ),
-        ],
+            // 2. Uji Coba Wrap untuk kumpulan Chip
+            const Text('Wrap Layout (Skills):', style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8.0, // Jarak antar Chip secara horizontal
+              runSpacing: 8.0, // Jarak antar Chip secara vertikal
+              children: skills.map((e) => Chip(label: Text(e))).toList(),
+            ),
+          ],
+        ),
       ),
     );
   }
