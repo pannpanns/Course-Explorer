@@ -12,20 +12,43 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(title: const Text('Tahap 1: Responsive Problem')),
-          body: Center(
-          child: Container(
-            width: double.infinity, // Berubah jadi fleksibel/responsif
-            color: Colors.green[200], 
-            padding: const EdgeInsets.all(16),
-            child: const Text(
+      home: MediaQueryPage(),
+    );
+  }
+}
+
+class MediaQueryPage extends StatelessWidget {
+  const MediaQueryPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final orientation = MediaQuery.of(context).orientation;
+
+    String layoutType = size.width < 600 ? 'Compact' : 'Wide';
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Tahap 2: MediaQuery')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
               '$studentId - $studentName',
-              style: TextStyle(fontSize: 18),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-          ),
+            const SizedBox(height: 20),
+            Text('Width: ${size.width.toStringAsFixed(0)}', style: const TextStyle(fontSize: 16)),
+            Text('Height: ${size.height.toStringAsFixed(0)}', style: const TextStyle(fontSize: 16)),
+            Text('Orientation: ${orientation.name}', style: const TextStyle(fontSize: 16)),
+            const SizedBox(height: 20),
+            Text(
+              'Layout: $layoutType',
+              style: const TextStyle(fontSize: 22, color: Colors.blue, fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
       ),
     );
