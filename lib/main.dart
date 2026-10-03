@@ -14,42 +14,96 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MediaQueryPage(),
+      home: LayoutBuilderPage(),
     );
   }
 }
 
-class MediaQueryPage extends StatelessWidget {
-  const MediaQueryPage({super.key});
+class LayoutBuilderPage extends StatelessWidget {
+  const LayoutBuilderPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final orientation = MediaQuery.of(context).orientation;
-
-    String layoutType = size.width < 600 ? 'Compact' : 'Wide';
-
     return Scaffold(
-      appBar: AppBar(title: const Text('Tahap 2: MediaQuery')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              '$studentId - $studentName',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            Text('Width: ${size.width.toStringAsFixed(0)}', style: const TextStyle(fontSize: 16)),
-            Text('Height: ${size.height.toStringAsFixed(0)}', style: const TextStyle(fontSize: 16)),
-            Text('Orientation: ${orientation.name}', style: const TextStyle(fontSize: 16)),
-            const SizedBox(height: 20),
-            Text(
-              'Layout: $layoutType',
-              style: const TextStyle(fontSize: 22, color: Colors.blue, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
+      appBar: AppBar(title: const Text('Tahap 3: LayoutBuilder')),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth < 600) {
+            return const CompactLayout();
+          } else if (constraints.maxWidth < 840) {
+            return const MediumLayout();
+          } else {
+            return const ExpandedLayout();
+          }
+        },
+      ),
+    );
+  }
+}
+
+class CompactLayout extends StatelessWidget {
+  const CompactLayout({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.red[100],
+      width: double.infinity,
+      child: const Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text('$studentId - $studentName', style: TextStyle(fontWeight: FontWeight.bold)),
+          SizedBox(height: 10),
+          Text('Compact Layout', style: TextStyle(fontSize: 24, color: Colors.red)),
+          Icon(Icons.smartphone, size: 64, color: Colors.red),
+        ],
+      ),
+    );
+  }
+}
+
+// 2. Tampilan Medium (Tablet Kecil / Landscape Phone)
+class MediumLayout extends StatelessWidget {
+  const MediumLayout({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.orange[100],
+      width: double.infinity,
+      child: const Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text('$studentId - $studentName', style: TextStyle(fontWeight: FontWeight.bold)),
+          SizedBox(height: 10),
+          Text('Medium Layout', style: TextStyle(fontSize: 28, color: Colors.orange)),
+          Icon(Icons.tablet_mac, size: 80, color: Colors.orange),
+        ],
+      ),
+    );
+  }
+}
+
+// 3. Tampilan Expanded (Desktop / Tablet Besar)
+class ExpandedLayout extends StatelessWidget {
+  const ExpandedLayout({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.green[100],
+      width: double.infinity,
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.desktop_windows, size: 100, color: Colors.green),
+          SizedBox(width: 20),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('$studentId - $studentName', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              Text('Expanded Layout', style: TextStyle(fontSize: 32, color: Colors.green)),
+            ],
+          ),
+        ],
       ),
     );
   }
