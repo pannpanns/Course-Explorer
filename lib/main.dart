@@ -14,85 +14,56 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: GridViewPage(),
+      home: ScrollablePage(),
     );
   }
 }
 
-class GridViewPage extends StatelessWidget {
-  const GridViewPage({super.key});
-
-  int columnsFor(double width) {
-    if (width < 600) return 1;
-    if (width < 840) return 2;
-    return 3;
-  }
+class ScrollablePage extends StatelessWidget {
+  const ScrollablePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> courses = [
-      {"code": "MOB01", "title": "Git & GitHub", "status": "Selesai"},
-      {"code": "MOB02", "title": "Dart Fundamentals", "status": "Selesai"},
-      {"code": "MOB03", "title": "Flutter UI", "status": "Berjalan"},
-      {"code": "MOB04", "title": "Navigation", "status": "Rencana"},
-      {"code": "MOB05", "title": "State Management", "status": "Rencana"},
-      {"code": "MOB06", "title": "API & Database", "status": "Rencana"},
-    ];
-
     return Scaffold(
-      appBar: AppBar(title: const Text('Tahap 5: GridView Responsif')),
-      body: Column(
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Text(
+      appBar: AppBar(title: const Text('Tahap 6: Scrollable Content')),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            const Text(
               '$studentId - $studentName',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-          ),
-          Expanded(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return GridView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: columnsFor(constraints.maxWidth),
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 2.5,
-                  ),
-                  itemCount: courses.length,
-                  itemBuilder: (context, index) {
-                    final course = courses[index];
-                    return Card(
-                      elevation: 2,
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              course['title'],
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(course['code']),
-                            const Spacer(),
-                            Text(
-                              course['status'],
-                              style: const TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                );
-              },
+            const SizedBox(height: 20),
+            Container(
+              height: 300,
+              color: Colors.blue[100],
+              alignment: Alignment.center,
+              child: const Text('Konten Bagian Atas', style: TextStyle(fontSize: 20)),
             ),
-          ),
-        ],
+            const SizedBox(height: 20),
+            Container(
+              height: 300,
+              color: Colors.orange[100],
+              alignment: Alignment.center,
+              child: const Text('Konten Bagian Tengah', style: TextStyle(fontSize: 20)),
+            ),
+            const SizedBox(height: 20),
+            const TextField(
+              decoration: InputDecoration(
+                labelText: 'Klik untuk buka keyboard...',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Container(
+              height: 300,
+              color: Colors.green[100],
+              alignment: Alignment.center,
+              child: const Text('Konten Bagian Bawah', style: TextStyle(fontSize: 20)),
+            ),
+          ],
+        ),
       ),
     );
   }
