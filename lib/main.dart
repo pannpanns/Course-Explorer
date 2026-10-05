@@ -14,88 +14,91 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: FormValidationPage(),
+      home: FeedbackPage(),
     );
   }
 }
 
-class FormValidationPage extends StatefulWidget {
-  const FormValidationPage({super.key});
+class FeedbackPage extends StatefulWidget {
+  const FeedbackPage({super.key});
 
   @override
-  State<FormValidationPage> createState() => _FormValidationPageState();
+  State<FeedbackPage> createState() => _FeedbackPageState();
 }
 
-class _FormValidationPageState extends State<FormValidationPage> {
-  final _formKey = GlobalKey<FormState>();
+class _FeedbackPageState extends State<FeedbackPage> {
+  bool _isLoading = false;
+
+  void _submitData() async {
+    final bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Konfirmasi'),
+          content: const Text('Lanjutkan proses penyimpanan data?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Batal'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Lanjutkan'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirm == true) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      await Future.delayed(const Duration(seconds: 2));
+
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Data berhasil disimpan!'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Tahap 13: Form & Validasi')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                '$studentId - $studentName',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                initialValue: studentName,
-                decoration: const InputDecoration(
-                  labelText: 'Nama',
-                  border: OutlineInputBorder(),
-                ),
-                readOnly: true,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                initialValue: studentId,
-                decoration: const InputDecoration(
-                  labelText: 'NIM',
-                  border: OutlineInputBorder(),
-                ),
-                readOnly: true,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Komentar Feedback',
-                  border: OutlineInputBorder(),
-                  hintText: 'Masukkan minimal 5 karakter',
-                ),
-                maxLines: 3,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Komentar wajib diisi';
-                  }
-                  if (value.trim().length < 5) {
-                    return 'Komentar minimal 5 karakter';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Feedback berhasil divalidasi dan dikirim!')),
-                      );
-                    }
-                  },
-                  child: const Text('Kirim Feedback'),
+      appBar: AppBar(title: const Text('Tahap 14: Dialog & Feedback')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              '$studentId - $studentName',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 40),
+            if (_isLoading)
+              const CircularProgressIndicator()
+            else
+              ElevatedButton.icon(
+                onPressed: _submitData,
+                icon: const Icon(Icons.save),
+                label: const Text('Simpan Data'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  textStyle: const TextStyle(fontSize: 16),
                 ),
               ),
-            ],
-          ),
+          ],
         ),
       ),
     );
