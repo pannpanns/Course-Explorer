@@ -14,83 +14,77 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: AdaptiveNavigationPage(),
+      home: InteractionPage(),
     );
   }
 }
 
-class AdaptiveNavigationPage extends StatefulWidget {
-  const AdaptiveNavigationPage({super.key});
+class InteractionPage extends StatefulWidget {
+  const InteractionPage({super.key});
 
   @override
-  State<AdaptiveNavigationPage> createState() => _AdaptiveNavigationPageState();
+  State<InteractionPage> createState() => _InteractionPageState();
 }
 
-class _AdaptiveNavigationPageState extends State<AdaptiveNavigationPage> {
-  int _selectedIndex = 0;
-
-  final List<Widget> _pages = [
-    const Center(
-      child: Text(
-        'Home Page\n$studentId - $studentName',
-        textAlign: TextAlign.center,
-        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-      ),
-    ),
-    const Center(
-      child: Text('Courses Page', style: TextStyle(fontSize: 24, color: Colors.green)),
-    ),
-    const Center(
-      child: Text('Profile Page', style: TextStyle(fontSize: 24, color: Colors.orange)),
-    ),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
+class _InteractionPageState extends State<InteractionPage> {
+  bool isFavorite = false;
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth < 840) {
-          return Scaffold(
-            appBar: AppBar(title: const Text('Tahap 11: Adaptive Navigation')),
-            body: _pages[_selectedIndex],
-            bottomNavigationBar: BottomNavigationBar(
-              currentIndex: _selectedIndex,
-              onTap: _onItemTapped,
-              items: const [
-                BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-                BottomNavigationBarItem(icon: Icon(Icons.school), label: 'Courses'),
-                BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-              ],
+    return Scaffold(
+      appBar: AppBar(title: const Text('Tahap 12: Interaction')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              '$studentId - $studentName',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-          );
-        } else {
-          return Scaffold(
-            appBar: AppBar(title: const Text('Tahap 11: Adaptive Navigation')),
-            body: Row(
-              children: [
-                NavigationRail(
-                  selectedIndex: _selectedIndex,
-                  onDestinationSelected: _onItemTapped,
-                  labelType: NavigationRailLabelType.all,
-                  destinations: const [
-                    NavigationRailDestination(icon: Icon(Icons.home), label: Text('Home')),
-                    NavigationRailDestination(icon: Icon(Icons.school), label: Text('Courses')),
-                    NavigationRailDestination(icon: Icon(Icons.person), label: Text('Profile')),
-                  ],
+            const SizedBox(height: 20),
+            Card(
+              elevation: 4,
+              clipBehavior: Clip.hardEdge,
+              child: InkWell(
+                onTap: () {
+                  setState(() {
+                    isFavorite = !isFavorite;
+                  });
+                },
+                onLongPress: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Menampilkan ringkasan materi...'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Flutter UI', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                          Text('MOB03', style: TextStyle(color: Colors.grey)),
+                        ],
+                      ),
+                      Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: isFavorite ? Colors.red : Colors.grey,
+                        size: 32,
+                      ),
+                    ],
+                  ),
                 ),
-                const VerticalDivider(width: 1),
-                Expanded(child: _pages[_selectedIndex]),
-              ],
+              ),
             ),
-          );
-        }
-      },
+          ],
+        ),
+      ),
     );
   }
 }
