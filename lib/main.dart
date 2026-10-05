@@ -14,75 +14,88 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: InteractionPage(),
+      home: FormValidationPage(),
     );
   }
 }
 
-class InteractionPage extends StatefulWidget {
-  const InteractionPage({super.key});
+class FormValidationPage extends StatefulWidget {
+  const FormValidationPage({super.key});
 
   @override
-  State<InteractionPage> createState() => _InteractionPageState();
+  State<FormValidationPage> createState() => _FormValidationPageState();
 }
 
-class _InteractionPageState extends State<InteractionPage> {
-  bool isFavorite = false;
+class _FormValidationPageState extends State<FormValidationPage> {
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Tahap 12: Interaction')),
-      body: Padding(
+      appBar: AppBar(title: const Text('Tahap 13: Form & Validasi')),
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              '$studentId - $studentName',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            Card(
-              elevation: 4,
-              clipBehavior: Clip.hardEdge,
-              child: InkWell(
-                onTap: () {
-                  setState(() {
-                    isFavorite = !isFavorite;
-                  });
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                '$studentId - $studentName',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                initialValue: studentName,
+                decoration: const InputDecoration(
+                  labelText: 'Nama',
+                  border: OutlineInputBorder(),
+                ),
+                readOnly: true,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                initialValue: studentId,
+                decoration: const InputDecoration(
+                  labelText: 'NIM',
+                  border: OutlineInputBorder(),
+                ),
+                readOnly: true,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Komentar Feedback',
+                  border: OutlineInputBorder(),
+                  hintText: 'Masukkan minimal 5 karakter',
+                ),
+                maxLines: 3,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Komentar wajib diisi';
+                  }
+                  if (value.trim().length < 5) {
+                    return 'Komentar minimal 5 karakter';
+                  }
+                  return null;
                 },
-                onLongPress: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Menampilkan ringkasan materi...'),
-                      duration: Duration(seconds: 2),
-                    ),
-                  );
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Flutter UI', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                          Text('MOB03', style: TextStyle(color: Colors.grey)),
-                        ],
-                      ),
-                      Icon(
-                        isFavorite ? Icons.favorite : Icons.favorite_border,
-                        color: isFavorite ? Colors.red : Colors.grey,
-                        size: 32,
-                      ),
-                    ],
-                  ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Feedback berhasil divalidasi dan dikirim!')),
+                      );
+                    }
+                  },
+                  child: const Text('Kirim Feedback'),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
