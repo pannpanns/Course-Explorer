@@ -1,0 +1,38 @@
+[
+  {
+    "code": "MOB01",
+    "title": "Git & GitHub",
+    "status": "Selesai",
+    "desc": "Mempelajari version control system dan kolaborasi menggunakan GitHub."
+  },
+  {
+    "code": "MOB02",
+    "title": "Dart Fundamentals",
+    "status": "Selesai",
+    "desc": "Mempelajari konsep dasar bahasa pemrograman Dart."
+  },
+  {
+    "code": "MOB03",
+    "title": "Flutter UI",
+    "status": "Berjalan",
+    "desc": "Membangun layout dan widget responsif menggunakan Flutter."
+  },
+  {
+    "code": "MOB04",
+    "title": "Navigation",
+    "status": "Berjalan",
+    "desc": "Mempelajari routing dan perpindahan antar-screen."
+  },
+  {
+    "code": "MOB05",
+    "title": "State Management",
+    "status": "Rencana",
+    "desc": "Mempelajari pengelolaan state pada aplikasi Flutter."
+  },
+  {
+    "code": "MOB06",
+    "title": "API & Database",
+    "status": "Rencana",
+    "desc": "Mempelajari koneksi API dan penyimpanan data."
+  }
+]
