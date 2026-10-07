@@ -1,6 +1,6 @@
 # course_explorer
 
-A new Flutter project.
+Memulai Worksheet 6 
 
 ## Getting Started
 
