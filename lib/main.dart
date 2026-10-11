@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'course_provider.dart';
+import 'models/course.dart';
 
 const String studentName = 'Putu Evan Jagadish Satriana';
 const String studentId = '2415051069';
@@ -11,21 +12,30 @@ void main() {
       create: (context) => CourseProvider(),
       child: const MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: Tahap7Page(),
+        home: Tahap8Page(),
       ),
     ),
   );
 }
 
-class Tahap7Page extends StatelessWidget {
-  const Tahap7Page({super.key});
+class Tahap8Page extends StatelessWidget {
+  const Tahap8Page({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final Map<String, dynamic> jsonMataKuliah = {
+      "code": "MOB05",
+      "title": "State Management",
+      "credits": 3,
+      "status": "active"
+    };
+
+    final Course course = Course.fromJson(jsonMataKuliah);
+
     final favoriteCount = context.watch<CourseProvider>().favorites.length;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Tahap 7: Mengakses State')),
+      appBar: AppBar(title: const Text('Tahap 8: Model Course')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -44,7 +54,7 @@ class Tahap7Page extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'Total Favorit (context.watch):',
+                      'Total Favorit:',
                       style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
                     ),
                     Text(
@@ -54,6 +64,35 @@ class Tahap7Page extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                         color: Colors.purple,
                       ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Card(
+              elevation: 2,
+              child: ListTile(
+                leading: const Icon(Icons.class_, color: Colors.blue),
+                title: Text(course.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Text('${course.code} • ${course.credits} SKS • ${course.status}'),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Consumer<CourseProvider>(
+                      builder: (context, provider, child) {
+                        final isFav = provider.favorites.contains(course.code);
+                        return Icon(
+                          isFav ? Icons.favorite : Icons.favorite_border,
+                          color: isFav ? Colors.red : Colors.grey,
+                        );
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.touch_app),
+                      onPressed: () {
+                        context.read<CourseProvider>().toggleFavorite(course.code);
+                      },
                     ),
                   ],
                 ),
