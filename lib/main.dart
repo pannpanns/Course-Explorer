@@ -6,81 +6,66 @@ const String studentId = '2415051069';
 void main() {
   runApp(const MaterialApp(
     debugShowCheckedModeBanner: false,
-    home: Tahap2Page(),
+    home: Tahap3Page(),
   ));
 }
 
-class Tahap2Page extends StatefulWidget {
-  const Tahap2Page({super.key});
+class Tahap3Page extends StatefulWidget {
+  const Tahap3Page({super.key});
 
   @override
-  State<Tahap2Page> createState() => _Tahap2PageState();
+  State<Tahap3Page> createState() => _Tahap3PageState();
 }
 
-class _Tahap2PageState extends State<Tahap2Page> {
-  bool isFavorite = false;
+class _Tahap3PageState extends State<Tahap3Page> {
+  final Set<String> _favoriteCourseCodes = {};
 
-  void toggleFavorite() {
+  final List<Map<String, String>> _courses = [
+    {'code': 'MOB05', 'title': 'State Management'},
+    {'code': 'MOB06', 'title': 'Local Storage'},
+  ];
+
+  void _toggleFavorite(String code) {
     setState(() {
-      isFavorite = !isFavorite;
+      if (_favoriteCourseCodes.contains(code)) {
+        _favoriteCourseCodes.remove(code);
+      } else {
+        _favoriteCourseCodes.add(code);
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Tahap 2: Masalah setState')),
+      appBar: AppBar(title: const Text('Tahap 3: Lifting State Up')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               '$studentId - $studentName',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-            CourseSummary(isFavorite: isFavorite),
+            CourseSummary(favoriteCount: _favoriteCourseCodes.length),
             const SizedBox(height: 16),
             const Divider(thickness: 2),
             const SizedBox(height: 16),
-            CourseItem(
-              title: 'State Management & Architecture',
-              code: 'MOB05',
-              isFavorite: isFavorite,
-              onFavoriteToggle: toggleFavorite,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class CourseSummary extends StatelessWidget {
-  final bool isFavorite;
-
-  const CourseSummary({super.key, required this.isFavorite});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      color: Colors.blue.shade50,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Total Course Favorit:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
-            Text(
-              '${isFavorite ? 1 : 0}',
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue,
+            Expanded(
+              child: ListView.builder(
+                itemCount: _courses.length,
+                itemBuilder: (context, index) {
+                  final course = _courses[index];
+                  final isFav = _favoriteCourseCodes.contains(course['code']);
+                  return CourseCard(
+                    title: course['title']!,
+                    code: course['code']!,
+                    isFavorite: isFav,
+                    onFavoriteChanged: () => _toggleFavorite(course['code']!),
+                  );
+                },
               ),
             ),
           ],
@@ -90,26 +75,60 @@ class CourseSummary extends StatelessWidget {
   }
 }
 
-class CourseItem extends StatelessWidget {
+class CourseSummary extends StatelessWidget {
+  final int favoriteCount;
+
+  const CourseSummary({super.key, required this.favoriteCount});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: Colors.green.shade50,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Total Favorit (Single Source of Truth):',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            ),
+            Text(
+              '$favoriteCount',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.green,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class CourseCard extends StatelessWidget {
   final String title;
   final String code;
   final bool isFavorite;
-  final VoidCallback onFavoriteToggle;
+  final VoidCallback onFavoriteChanged;
 
-  const CourseItem({
+  const CourseCard({
     super.key,
     required this.title,
     required this.code,
     required this.isFavorite,
-    required this.onFavoriteToggle,
+    required this.onFavoriteChanged,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 2,
+      margin: const EdgeInsets.only(bottom: 8.0),
       child: ListTile(
-        leading: const Icon(Icons.menu_book, color: Colors.blue),
+        leading: const Icon(Icons.menu_book, color: Colors.green),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Text(code),
         trailing: IconButton(
@@ -117,7 +136,7 @@ class CourseItem extends StatelessWidget {
             isFavorite ? Icons.favorite : Icons.favorite_border,
             color: isFavorite ? Colors.red : Colors.grey,
           ),
-          onPressed: onFavoriteToggle,
+          onPressed: onFavoriteChanged,
         ),
       ),
     );
