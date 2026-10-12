@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'course_provider.dart';
-import 'models/course.dart';
 import 'services/course_service.dart';
 import 'repositories/course_repository.dart';
 
@@ -9,40 +8,42 @@ const String studentName = 'Putu Evan Jagadish Satriana';
 const String studentId = '2415051069';
 
 void main() {
+  final service = CourseService();
+  final repository = CourseRepository(service);
+
   runApp(
     ChangeNotifierProvider(
-      create: (context) => CourseProvider(),
+      create: (context) => CourseProvider(repository),
       child: const MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: Tahap10Page(),
+        home: Tahap11Page(),
       ),
     ),
   );
 }
 
-class Tahap10Page extends StatefulWidget {
-  const Tahap10Page({super.key});
+class Tahap11Page extends StatefulWidget {
+  const Tahap11Page({super.key});
 
   @override
-  State<Tahap10Page> createState() => _Tahap10PageState();
+  State<Tahap11Page> createState() => _Tahap11PageState();
 }
 
-class _Tahap10PageState extends State<Tahap10Page> {
-  late final CourseRepository _repository;
-  late Future<List<Course>> _coursesFuture;
-
+class _Tahap11PageState extends State<Tahap11Page> {
   @override
   void initState() {
     super.initState();
-    final service = CourseService();
-    _repository = CourseRepository(service);
-    _coursesFuture = _repository.getCourses();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<CourseProvider>().loadCourses();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<CourseProvider>();
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Tahap 10: Repository Pattern')),
+      appBar: AppBar(title: const Text('Tahap 11: Async State')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -53,35 +54,38 @@ class _Tahap10PageState extends State<Tahap10Page> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-            Expanded(
-              child: FutureBuilder<List<Course>>(
-                future: _coursesFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(child: Text('Tidak ada data course'));
-                  }
-
-                  final courses = snapshot.data!;
-                  return ListView.builder(
-                    itemCount: courses.length,
-                    itemBuilder: (context, index) {
-                      final course = courses[index];
-                      return Card(
-                        child: ListTile(
-                          leading: const Icon(Icons.class_, color: Colors.blue),
-                          title: Text(course.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                          subtitle: Text('${course.code} • ${course.credits} SKS • ${course.status}'),
+            if (provider.isLoading)
+              const Expanded(child: Center(child: CircularProgressIndicator()))
+            else if (provider.error != null)
+              Expanded(child: Center(child: Text('Error: ${provider.error}')))
+            else if (provider.courses.isEmpty)
+              const Expanded(child: Center(child: Text('Tidak ada data course')))
+            else
+              Expanded(
+                child: ListView.builder(
+                  itemCount: provider.courses.length,
+                  itemBuilder: (context, index) {
+                    final course = provider.courses[index];
+                    final isFav = provider.favorites.contains(course.code);
+                    return Card(
+                      child: ListTile(
+                        leading: const Icon(Icons.class_, color: Colors.blue),
+                        title: Text(course.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Text('${course.code} • ${course.credits} SKS • ${course.status}'),
+                        trailing: IconButton(
+                          icon: Icon(
+                            isFav ? Icons.favorite : Icons.favorite_border,
+                            color: isFav ? Colors.red : Colors.grey,
+                          ),
+                          onPressed: () {
+                            context.read<CourseProvider>().toggleFavorite(course.code);
+                          },
                         ),
-                      );
-                    },
-                  );
-                },
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
           ],
         ),
       ),
