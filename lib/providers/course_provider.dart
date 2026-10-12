@@ -18,7 +18,7 @@ class CourseProvider extends ChangeNotifier {
     } else {
       favorites.add(id);
     }
-    //notifyListeners(); // Test Mematikan notifyListeners()
+    notifyListeners();
   }
 
   Future<void> loadCourses() async {

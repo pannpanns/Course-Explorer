@@ -2,16 +2,15 @@
 
 Memulai Worksheet 6 
 
-## Getting Started
+# Course Explorer v2
 
-This project is a starting point for a Flutter application.
+## Tanggung Jawab Folder (Directory Structure)
 
-A few resources to get you started if this is your first Flutter project:
+Pemisahan folder dilakukan berdasarkan prinsip *Separation of Concerns* agar kode mudah dipelihara dan dikembangkan:
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+*   **`models/`**: Menyimpan kelas *blueprint* struktur data (contoh: `Course`). Bertanggung jawab untuk mengubah format data mentah (seperti JSON) menjadi objek Dart (melalui *factory method* `fromJson`).
+*   **`services/`**: Berfungsi sebagai *Data Source*. Bertanggung jawab menangani komunikasi dengan sumber data eksternal, seperti membaca file aset lokal (`rootBundle`) atau melakukan *request HTTP* ke REST API. 
+*   **`repositories/`**: Berperan sebagai lapisan abstraksi antara *Service* dan aplikasi. Bertanggung jawab mengelola aliran data dari berbagai *Service* agar UI/Provider tidak perlu tahu asal usul datanya secara teknis.
+*   **`providers/`**: Menyimpan logika bisnis dan *State Management* terpusat (menggunakan `ChangeNotifier`). Bertanggung jawab menyimpan *state* (loading, error, list data) dan memberitahukan UI (`notifyListeners`) jika ada perubahan data.
+*   **`screens/`**: Berisi sekumpulan halaman penuh (*full page*) atau antarmuka utama aplikasi (contoh: `HomePage`, `DashboardPage`, `MainScreen`). Lapisan ini dilarang berisi logika pengolahan data mentah.
+*   **`widgets/`**: Menyimpan komponen antarmuka kecil yang dapat digunakan kembali (*reusable components*), seperti `CourseCard`. Membantu menjaga ukuran file di *screens* tetap ringkas.
