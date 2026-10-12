@@ -4,7 +4,7 @@ Memulai Worksheet 6
 
 # Course Explorer v2
 
-## Tanggung Jawab Folder (Directory Structure)
+## Tanggung Jawab Folder
 
 Pemisahan folder dilakukan berdasarkan prinsip *Separation of Concerns* agar kode mudah dipelihara dan dikembangkan:
 
