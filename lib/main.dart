@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'course_provider.dart';
 import 'models/course.dart';
+import 'services/course_service.dart';
 
 const String studentName = 'Putu Evan Jagadish Satriana';
 const String studentId = '2415051069';
@@ -12,30 +13,33 @@ void main() {
       create: (context) => CourseProvider(),
       child: const MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: Tahap8Page(),
+        home: Tahap9Page(),
       ),
     ),
   );
 }
 
-class Tahap8Page extends StatelessWidget {
-  const Tahap8Page({super.key});
+class Tahap9Page extends StatefulWidget {
+  const Tahap9Page({super.key});
+
+  @override
+  State<Tahap9Page> createState() => _Tahap9PageState();
+}
+
+class _Tahap9PageState extends State<Tahap9Page> {
+  final CourseService _courseService = CourseService();
+  late Future<List<Course>> _coursesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _coursesFuture = _courseService.loadCourses();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final Map<String, dynamic> jsonMataKuliah = {
-      "code": "MOB05",
-      "title": "State Management",
-      "credits": 3,
-      "status": "active"
-    };
-
-    final Course course = Course.fromJson(jsonMataKuliah);
-
-    final favoriteCount = context.watch<CourseProvider>().favorites.length;
-
     return Scaffold(
-      appBar: AppBar(title: const Text('Tahap 8: Model Course')),
+      appBar: AppBar(title: const Text('Tahap 9: Service Data Source')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -46,56 +50,33 @@ class Tahap8Page extends StatelessWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-            Card(
-              color: Colors.purple.shade50,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Total Favorit:',
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                    ),
-                    Text(
-                      '$favoriteCount',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.purple,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Card(
-              elevation: 2,
-              child: ListTile(
-                leading: const Icon(Icons.class_, color: Colors.blue),
-                title: Text(course.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Text('${course.code} • ${course.credits} SKS • ${course.status}'),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Consumer<CourseProvider>(
-                      builder: (context, provider, child) {
-                        final isFav = provider.favorites.contains(course.code);
-                        return Icon(
-                          isFav ? Icons.favorite : Icons.favorite_border,
-                          color: isFav ? Colors.red : Colors.grey,
-                        );
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.touch_app),
-                      onPressed: () {
-                        context.read<CourseProvider>().toggleFavorite(course.code);
-                      },
-                    ),
-                  ],
-                ),
+            Expanded(
+              child: FutureBuilder<List<Course>>(
+                future: _coursesFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text('Tidak ada data course'));
+                  }
+
+                  final courses = snapshot.data!;
+                  return ListView.builder(
+                    itemCount: courses.length,
+                    itemBuilder: (context, index) {
+                      final course = courses[index];
+                      return Card(
+                        child: ListTile(
+                          leading: const Icon(Icons.class_, color: Colors.blue),
+                          title: Text(course.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                          subtitle: Text('${course.code} • ${course.credits} SKS • ${course.status}'),
+                        ),
+                      );
+                    },
+                  );
+                },
               ),
             ),
           ],

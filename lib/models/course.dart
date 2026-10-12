@@ -11,7 +11,6 @@ class Course {
     required this.status,
   });
 
-  // Factory untuk memparsing JSON menjadi Object Course
   factory Course.fromJson(Map<String, dynamic> json) {
     return Course(
       code: json['code'] as String,

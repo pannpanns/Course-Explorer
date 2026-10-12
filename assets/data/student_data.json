@@ -1,0 +1,22 @@
+{
+  "courses": [
+    {
+      "code": "MOB05",
+      "title": "State Management",
+      "credits": 3,
+      "status": "active"
+    },
+    {
+      "code": "MOB06",
+      "title": "Local Storage",
+      "credits": 3,
+      "status": "active"
+    },
+    {
+      "code": "MOB07",
+      "title": "REST API",
+      "credits": 3,
+      "status": "active"
+    }
+  ]
+}
