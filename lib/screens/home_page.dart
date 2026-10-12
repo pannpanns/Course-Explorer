@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/course_provider.dart';
 import '../widgets/course_card.dart';
+import 'favorites_page.dart';
 
 const String studentName = 'Putu Evan Jagadish Satriana';
 const String studentId = '2415051069';
@@ -27,7 +28,22 @@ class _HomePageState extends State<HomePage> {
     final provider = context.watch<CourseProvider>();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Tahap 12: Refactor Folder')),
+      appBar: AppBar(
+        title: const Text('Tahap 13: Shared State'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.favorite, color: Colors.red),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const FavoritesPage(),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
