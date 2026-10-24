@@ -117,7 +117,7 @@ class _CourseFormPageState extends State<CourseFormPage> {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _status,
+                initialValue: _status,
                 decoration: const InputDecoration(labelText: 'Status', border: OutlineInputBorder()),
                 items: const [
                   DropdownMenuItem(value: 'planned', child: Text('Planned')),
