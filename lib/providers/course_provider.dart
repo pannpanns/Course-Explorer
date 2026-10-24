@@ -35,4 +35,9 @@ class CourseProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<void> createCourse(Course course) async {
+    await repository.createCourse(course);
+    await loadCourses(); 
+  }
 }
