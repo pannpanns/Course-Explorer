@@ -45,4 +45,14 @@ class CourseProvider extends ChangeNotifier {
     await repository.updateCourse(id, course);
     await loadCourses();
   }
+
+  Future<void> deleteCourse(int id, String code) async {
+    await repository.deleteCourse(id);
+    
+    if (favorites.contains(code)) {
+      favorites.remove(code);
+    }
+    
+    await loadCourses();
+  }
 }
