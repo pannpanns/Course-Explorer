@@ -1,16 +1,39 @@
-# course_explorer
+# Course Data Manager (Course Explorer v2)
 
-Memulai Worksheet 6 
+Aplikasi Flutter untuk eksplorasi dan manajemen data mata kuliah (CRUD), dibangun menggunakan Clean Architecture, Provider State Management, REST API, dan Supabase.
 
-# Course Explorer v2
+## Dokumentasi REST Endpoint (Tahap 1)
 
-## Tanggung Jawab Folder
+* **Base URL (`apiBaseUrl`):** `https://course-api-pearl.vercel.app`
+* **Endpoint URL (GET):** `https://course-api-pearl.vercel.app/courses`
+* **HTTP Method:** `GET`
+* **Status Code:** `200 OK`
+* **Resource:** `courses`
 
-Pemisahan folder dilakukan berdasarkan prinsip *Separation of Concerns* agar kode mudah dipelihara dan dikembangkan:
+### Daftar Endpoint CRUD:
+* `GET /courses` — Mengambil seluruh daftar course (diurutkan berdasarkan `id`).
+* `GET /courses?status=active` — Mengambil daftar course berdasarkan filter status.
+* `GET /courses/:id` — Mengambil detail satu course berdasarkan `id`.
+* `POST /courses` — Membuat course baru (mengembalikan status `201 Created`).
+* `PUT /courses/:id` — Memperbarui seluruh data course berdasarkan `id` (`200 OK`).
+* `PATCH /courses/:id` — Memperbarui sebagian field course berdasarkan `id` (`200 OK`).
+* `DELETE /courses/:id` — Menghapus course berdasarkan `id` (`204 No Content`).
 
-*   **`models/`**: Menyimpan kelas *blueprint* struktur data (contoh: `Course`). Bertanggung jawab untuk mengubah format data mentah (seperti JSON) menjadi objek Dart (melalui *factory method* `fromJson`).
-*   **`services/`**: Berfungsi sebagai *Data Source*. Bertanggung jawab menangani komunikasi dengan sumber data eksternal, seperti membaca file aset lokal (`rootBundle`) atau melakukan *request HTTP* ke REST API. 
-*   **`repositories/`**: Berperan sebagai lapisan abstraksi antara *Service* dan aplikasi. Bertanggung jawab mengelola aliran data dari berbagai *Service* agar UI/Provider tidak perlu tahu asal usul datanya secara teknis.
-*   **`providers/`**: Menyimpan logika bisnis dan *State Management* terpusat (menggunakan `ChangeNotifier`). Bertanggung jawab menyimpan *state* (loading, error, list data) dan memberitahukan UI (`notifyListeners`) jika ada perubahan data.
-*   **`screens/`**: Berisi sekumpulan halaman penuh (*full page*) atau antarmuka utama aplikasi (contoh: `HomePage`, `DashboardPage`, `MainScreen`). Lapisan ini dilarang berisi logika pengolahan data mentah.
-*   **`widgets/`**: Menyimpan komponen antarmuka kecil yang dapat digunakan kembali (*reusable components*), seperti `CourseCard`. Membantu menjaga ukuran file di *screens* tetap ringkas.
+### Struktur Field JSON:
+1. `id` (int): Identifier unik untuk setiap data mata kuliah.
+2. `code` (String): Kode unik mata kuliah (contoh: `"MOB01"`).
+3. `title` (String): Nama atau judul mata kuliah (contoh: `"Git & GitHub"`).
+4. `credits` (int): Jumlah beban SKS mata kuliah (contoh: `2`).
+5. `status` (String): Status pembelajaran mata kuliah (`"planned"`, `"active"`, atau `"done"`).
+
+### Contoh Response Body JSON:
+```json
+[
+  {
+    "id": 1,
+    "code": "MOB01",
+    "title": "Git & GitHub",
+    "credits": 2,
+    "status": "active"
+  }
+]
