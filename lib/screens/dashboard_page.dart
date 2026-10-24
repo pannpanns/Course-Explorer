@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import '../main.dart';
+import '../models/course.dart';
 import '../providers/course_provider.dart';
+import '../widgets/course_card.dart';
 
 const String apiUrl = 'https://course-api-pearl.vercel.app/courses';
 
@@ -15,7 +17,7 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  late Future<List<dynamic>> _apiCoursesFuture;
+  late Future<List<Course>> _apiCoursesFuture;
 
   @override
   void initState() {
@@ -23,12 +25,13 @@ class _DashboardPageState extends State<DashboardPage> {
     _apiCoursesFuture = fetchCourses();
   }
 
-  Future<List<dynamic>> fetchCourses() async {
+  Future<List<Course>> fetchCourses() async {
     final response = await http.get(Uri.parse(apiUrl));
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body) as List<dynamic>;
-      debugPrint('$studentId - $studentName | HTTP GET: ${data.length} courses');
-      return data;
+      final List<dynamic> data = jsonDecode(response.body) as List<dynamic>;
+      return data
+          .map((e) => Course.fromJson(e as Map<String, dynamic>))
+          .toList();
     }
     throw Exception('HTTP ${response.statusCode}');
   }
@@ -94,70 +97,6 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
           const SizedBox(height: 24),
           const Text(
-            'Status HTTP GET (Tahap 2)',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 14),
-          FutureBuilder<List<dynamic>>(
-            future: _apiCoursesFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Card(
-                  color: Colors.white,
-                  child: Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(strokeWidth: 2.5),
-                        ),
-                        SizedBox(width: 14),
-                        Text('Mengambil data dari REST API...'),
-                      ],
-                    ),
-                  ),
-                );
-              }
-
-              if (snapshot.hasError) {
-                return Card(
-                  color: Colors.red.shade50,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.error_outline, color: Colors.red),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'Gagal memuat API: ${snapshot.error}',
-                            style: const TextStyle(
-                              color: Colors.red,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }
-
-              final apiCourses = snapshot.data ?? [];
-              return OverviewCard(
-                icon: Icons.cloud_done,
-                title: '${apiCourses.length} Courses dari REST API',
-                subtitle: 'Endpoint: $apiUrl (Status 200 OK)',
-              );
-            },
-          ),
-          const SizedBox(height: 24),
-          const Text(
             'Overview',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
@@ -199,6 +138,48 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                   ),
                 ],
+              );
+            },
+          ),
+          const SizedBox(height: 24),
+          const Text(
+            'Daftar Course dari REST API (Tahap 3)',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 14),
+          FutureBuilder<List<Course>>(
+            future: _apiCoursesFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(24),
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
+
+              if (snapshot.hasError) {
+                return Card(
+                  color: Colors.red.shade50,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      'Error: ${snapshot.error}',
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ),
+                );
+              }
+
+              final apiCourses = snapshot.data ?? [];
+              return ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: apiCourses.length,
+                itemBuilder: (context, index) {
+                  return CourseCard(course: apiCourses[index]);
+                },
               );
             },
           ),
