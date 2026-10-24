@@ -4,7 +4,7 @@ import '../repositories/course_repository.dart';
 
 class CourseProvider extends ChangeNotifier {
   final CourseRepository repository;
-
+  
   CourseProvider(this.repository);
 
   final Set<String> favorites = {};
@@ -12,11 +12,11 @@ class CourseProvider extends ChangeNotifier {
   bool isLoading = false;
   String? error;
 
-  void toggleFavorite(String id) {
-    if (favorites.contains(id)) {
-      favorites.remove(id);
+  void toggleFavorite(String code) {
+    if (favorites.contains(code)) {
+      favorites.remove(code);
     } else {
-      favorites.add(id);
+      favorites.add(code);
     }
     notifyListeners();
   }

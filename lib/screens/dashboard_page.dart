@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../main.dart';
 import '../providers/course_provider.dart';
 import '../widgets/course_card.dart';
+import '../widgets/error_view.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
@@ -46,6 +47,11 @@ class DashboardPage extends StatelessWidget {
                     height: 1.15,
                   ),
                 ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Integrasi REST API & Backend Database pada Flutter.',
+                  style: TextStyle(color: Colors.white70, fontSize: 15),
+                ),
                 const SizedBox(height: 18),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -63,16 +69,78 @@ class DashboardPage extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           const Text(
-            'Daftar Course (REST API melalui Service)',
+            'Overview',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 14),
-          
-          // Membaca data langsung dari Provider, bukan dari HTTP secara manual
+          LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth < 520) {
+                return Column(
+                  children: [
+                    OverviewCard(
+                      icon: Icons.school,
+                      title: '${provider.courses.length} Courses',
+                      subtitle: 'Tersedia di State Provider',
+                    ),
+                    const SizedBox(height: 12),
+                    OverviewCard(
+                      icon: Icons.favorite,
+                      title: '${provider.favorites.length} Favorites',
+                      subtitle: 'Course Disukai',
+                    ),
+                  ],
+                );
+              }
+              return Row(
+                children: [
+                  Expanded(
+                    child: OverviewCard(
+                      icon: Icons.school,
+                      title: '${provider.courses.length} Courses',
+                      subtitle: 'Tersedia di State Provider',
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: OverviewCard(
+                      icon: Icons.favorite,
+                      title: '${provider.favorites.length} Favorites',
+                      subtitle: 'Course Disukai',
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: 24),
+          const Text(
+            'Daftar Course (REST API)',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 14),
           if (provider.isLoading)
-            const Center(child: CircularProgressIndicator())
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(24.0),
+                child: CircularProgressIndicator(),
+              ),
+            )
           else if (provider.error != null)
-            Text('Error: ${provider.error}', style: const TextStyle(color: Colors.red))
+            ErrorView(
+              message: provider.error!,
+              onRetry: provider.loadCourses,
+            )
+          else if (provider.courses.isEmpty)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(24.0),
+                child: Text(
+                  'Data course belum tersedia / kosong.',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+            )
           else
             ListView.builder(
               shrinkWrap: true,
@@ -83,6 +151,65 @@ class DashboardPage extends StatelessWidget {
               },
             ),
         ],
+      ),
+    );
+  }
+}
+
+class OverviewCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+
+  const OverviewCard({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final primaryColor = Theme.of(context).colorScheme.primary;
+    return Card(
+      color: Colors.white,
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: primaryColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(icon, color: primaryColor),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
