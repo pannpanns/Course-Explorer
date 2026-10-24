@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'providers/course_provider.dart';
 import 'repositories/course_repository.dart';
 import 'services/course_data_source.dart';
@@ -11,7 +13,16 @@ const String studentId = '2415051069';
 const Color primaryColor = Color(0xFF4F46E5);
 const String apiBaseUrl = 'https://course-api-pearl.vercel.app';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  await dotenv.load(fileName: ".env");
+  
+  await Supabase.initialize(
+    url: dotenv.env['SUPABASE_URL']!,
+    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
+  );
+
   final CourseDataSource dataSource = CourseApiService(apiBaseUrl);
   final repository = CourseRepository(dataSource);
 
