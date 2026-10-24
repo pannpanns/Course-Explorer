@@ -4,7 +4,9 @@ import '../models/course.dart';
 import '../providers/course_provider.dart';
 
 class CourseFormPage extends StatefulWidget {
-  const CourseFormPage({super.key});
+  final Course? course;
+
+  const CourseFormPage({super.key, this.course});
 
   @override
   State<CourseFormPage> createState() => _CourseFormPageState();
@@ -18,6 +20,19 @@ class _CourseFormPageState extends State<CourseFormPage> {
   String _status = 'planned';
   bool _isSaving = false;
 
+  bool get isEditMode => widget.course != null;
+
+  @override
+  void initState() {
+    super.initState();
+    if (isEditMode) {
+      _codeController.text = widget.course!.code;
+      _titleController.text = widget.course!.title;
+      _creditsController.text = widget.course!.credits.toString();
+      _status = widget.course!.status;
+    }
+  }
+
   @override
   void dispose() {
     _codeController.dispose();
@@ -28,10 +43,10 @@ class _CourseFormPageState extends State<CourseFormPage> {
 
   Future<void> _saveCourse() async {
     if (!_formKey.currentState!.validate()) return;
-
     setState(() => _isSaving = true);
 
-    final newCourse = Course(
+    final courseData = Course(
+      id: isEditMode ? widget.course!.id : null,
       code: _codeController.text,
       title: _titleController.text,
       credits: int.parse(_creditsController.text),
@@ -39,10 +54,18 @@ class _CourseFormPageState extends State<CourseFormPage> {
     );
 
     try {
-      await context.read<CourseProvider>().createCourse(newCourse);
+      if (isEditMode) {
+        await context.read<CourseProvider>().updateCourse(widget.course!.id!, courseData);
+      } else {
+        await context.read<CourseProvider>().createCourse(courseData);
+      }
+
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Course berhasil ditambahkan!'), backgroundColor: Colors.green),
+        SnackBar(
+          content: Text(isEditMode ? 'Course berhasil diperbarui!' : 'Course berhasil ditambahkan!'),
+          backgroundColor: Colors.green,
+        ),
       );
       Navigator.pop(context);
     } catch (e) {
@@ -51,9 +74,7 @@ class _CourseFormPageState extends State<CourseFormPage> {
         SnackBar(content: Text('Gagal: ${e.toString()}'), backgroundColor: Colors.red),
       );
     } finally {
-      if (mounted) {
-        setState(() => _isSaving = false);
-      }
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 
@@ -61,7 +82,7 @@ class _CourseFormPageState extends State<CourseFormPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tambah Course Baru'),
+        title: Text(isEditMode ? 'Edit Course' : 'Tambah Course Baru'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -72,7 +93,7 @@ class _CourseFormPageState extends State<CourseFormPage> {
               TextFormField(
                 controller: _codeController,
                 decoration: const InputDecoration(labelText: 'Kode Course', border: OutlineInputBorder()),
-                enabled: !_isSaving,
+                enabled: !isEditMode && !_isSaving,
                 validator: (value) => value == null || value.isEmpty ? 'Kode tidak boleh kosong' : null,
               ),
               const SizedBox(height: 16),
@@ -96,7 +117,7 @@ class _CourseFormPageState extends State<CourseFormPage> {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                initialValue: _status,
+                value: _status,
                 decoration: const InputDecoration(labelText: 'Status', border: OutlineInputBorder()),
                 items: const [
                   DropdownMenuItem(value: 'planned', child: Text('Planned')),
@@ -118,7 +139,7 @@ class _CourseFormPageState extends State<CourseFormPage> {
                   ),
                   child: _isSaving
                       ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text('Simpan Course', style: TextStyle(fontSize: 16)),
+                      : Text(isEditMode ? 'Update Course' : 'Simpan Course', style: const TextStyle(fontSize: 16)),
                 ),
               ),
             ],
