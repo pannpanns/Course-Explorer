@@ -1,7 +1,7 @@
 # Course Data Manager (Course Explorer v2)
 
 Aplikasi Flutter untuk eksplorasi dan manajemen data mata kuliah (CRUD), dibangun menggunakan Clean Architecture, Provider State Management, REST API, dan Supabase.
-
+q
 ## Dokumentasi REST Endpoint (Tahap 1)
 
 * **Base URL (`apiBaseUrl`):** `https://course-api-pearl.vercel.app`
