@@ -133,7 +133,7 @@ class DashboardPage extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           const Text(
-            'Daftar Course (REST API)',
+            'Daftar Course',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 14),

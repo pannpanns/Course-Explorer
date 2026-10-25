@@ -5,13 +5,12 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'providers/course_provider.dart';
 import 'repositories/course_repository.dart';
 import 'services/course_data_source.dart';
-import 'services/course_api_service.dart';
+import 'services/course_supabase_service.dart';
 import 'screens/main_screen.dart';
 
 const String studentName = 'Putu Evan Jagadish Satriana';
 const String studentId = '2415051069';
 const Color primaryColor = Color(0xFF4F46E5);
-const String apiBaseUrl = 'https://course-api-pearl.vercel.app';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +22,7 @@ Future<void> main() async {
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
-  final CourseDataSource dataSource = CourseApiService(apiBaseUrl);
+  final CourseDataSource dataSource = CourseSupabaseService();
   final repository = CourseRepository(dataSource);
 
   runApp(
