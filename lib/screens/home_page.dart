@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../main.dart';
 import '../providers/course_provider.dart';
 import '../widgets/course_card.dart';
+import '../widgets/error_view.dart';
+import 'course_form_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -10,33 +13,79 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = context.watch<CourseProvider>();
 
-    if (provider.isLoading) return const Center(child: CircularProgressIndicator());
-    if (provider.courses.isEmpty) return const Center(child: Text('Tidak ada data'));
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth < 600) {
-          return ListView.separated(
-            padding: const EdgeInsets.all(16),
-            itemCount: provider.courses.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 14),
-            itemBuilder: (context, index) => CourseCard(course: provider.courses[index]),
-          );
-        }
-
-        final int columns = constraints.maxWidth < 840 ? 2 : 3;
-        return GridView.builder(
-          padding: const EdgeInsets.all(16),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: columns,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            mainAxisExtent: 215,
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Manajemen Course',
+                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      '$studentName • $studentId',
+                      style: TextStyle(color: Colors.grey, fontSize: 13),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                onPressed: provider.loadCourses,
+                icon: const Icon(Icons.refresh),
+                tooltip: 'Refresh Data',
+              ),
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const CourseFormPage()),
+                  );
+                },
+                icon: const Icon(Icons.add),
+                label: const Text('Tambah'),
+              ),
+            ],
           ),
-          itemCount: provider.courses.length,
-          itemBuilder: (context, index) => CourseCard(course: provider.courses[index]),
-        );
-      },
+          const SizedBox(height: 16),
+          Expanded(
+            child: Builder(
+              builder: (context) {
+                if (provider.isLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (provider.error != null) {
+                  return ErrorView(
+                    message: provider.error!,
+                    onRetry: provider.loadCourses,
+                  );
+                }
+                if (provider.courses.isEmpty) {
+                  return const Center(
+                    child: Text('Data course belum tersedia'),
+                  );
+                }
+                return RefreshIndicator(
+                  onRefresh: provider.loadCourses,
+                  child: ListView.builder(
+                    itemCount: provider.courses.length,
+                    itemBuilder: (context, index) {
+                      return CourseCard(course: provider.courses[index]);
+                    },
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

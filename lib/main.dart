@@ -11,12 +11,13 @@ import 'screens/main_screen.dart';
 const String studentName = 'Putu Evan Jagadish Satriana';
 const String studentId = '2415051069';
 const Color primaryColor = Color(0xFF4F46E5);
+const String apiBaseUrl = 'https://course-api-pearl.vercel.app';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   await dotenv.load(fileName: ".env");
-  
+
   await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
@@ -27,7 +28,7 @@ Future<void> main() async {
 
   runApp(
     ChangeNotifierProvider(
-      create: (context) => CourseProvider(repository)..loadCourses(),
+      create: (_) => CourseProvider(repository)..loadCourses(),
       child: const MyApp(),
     ),
   );

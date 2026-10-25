@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/course.dart';
 import '../providers/course_provider.dart';
+import '../screens/course_detail_page.dart';
 import '../screens/course_form_page.dart';
 
 class CourseCard extends StatelessWidget {
@@ -10,7 +11,7 @@ class CourseCard extends StatelessWidget {
   const CourseCard({super.key, required this.course});
 
   void _confirmDelete(BuildContext context) {
-    showDialog(
+    showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Hapus Course?'),
@@ -29,7 +30,6 @@ class CourseCard extends StatelessWidget {
     ).then((confirmed) async {
       if (confirmed == true) {
         if (!context.mounted) return;
-        
         try {
           await context.read<CourseProvider>().deleteCourse(course.id!, course.code);
           if (!context.mounted) return;
@@ -54,6 +54,14 @@ class CourseCard extends StatelessWidget {
       elevation: 2,
       margin: const EdgeInsets.only(bottom: 12.0),
       child: ListTile(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CourseDetailPage(course: course),
+            ),
+          );
+        },
         leading: const Icon(Icons.class_, color: Colors.blue),
         title: Text(course.title, style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Text('${course.code} • ${course.credits} SKS\nStatus: ${course.status}'),
