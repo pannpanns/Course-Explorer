@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/auth_service.dart';
 import '../services/profile_service.dart';
 import '../services/kos_service.dart';
+import '../services/notification_service.dart';
 import '../widgets/role_guard.dart';
 import 'login_page.dart';
 
@@ -16,11 +17,58 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late Future<UserProfile?> _profileFuture;
   late Future<List<Map<String, dynamic>>> _kosFuture;
+  String? _fcmToken;
 
   @override
   void initState() {
     super.initState();
     _loadData();
+    _initNotification();
+  }
+
+  Future<void> _initNotification() async {
+    await NotificationService.instance.init();
+    final token = await NotificationService.instance.getToken();
+    if (token != null && mounted) {
+      setState(() => _fcmToken = token);
+    }
+  }
+
+  void _showTokenDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('FCM Device Token'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Token ini digunakan untuk mengirim push notification ke perangkat ini:',
+              style: TextStyle(fontSize: 13),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: SelectableText(
+                _fcmToken ?? 'Sedang mengambil token... silakan tutup dan buka lagi.',
+                style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Tutup'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _loadData() {
@@ -296,6 +344,11 @@ class _HomePageState extends State<HomePage> {
           appBar: AppBar(
             title: Text('KosFinder (${p.role})'),
             actions: [
+              IconButton(
+                tooltip: 'Lihat Token FCM',
+                icon: const Icon(Icons.key),
+                onPressed: _showTokenDialog,
+              ),
               IconButton(
                 tooltip: 'Refresh',
                 icon: const Icon(Icons.refresh),
