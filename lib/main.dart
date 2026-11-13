@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -8,7 +7,7 @@ import 'providers/course_provider.dart';
 import 'repositories/course_repository.dart';
 import 'services/course_data_source.dart';
 import 'services/course_supabase_service.dart';
-import 'screens/main_screen.dart';
+import 'pages/login_page.dart';
 
 const String studentName = 'Putu Evan Jagadish Satriana';
 const String studentId = '2415051069';
@@ -21,7 +20,7 @@ Future<void> main() async {
 
   await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,
-    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
+    publishableKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
   final CourseDataSource dataSource = CourseSupabaseService();
@@ -30,31 +29,24 @@ Future<void> main() async {
   runApp(
     ChangeNotifierProvider(
       create: (_) => CourseProvider(repository)..loadCourses(),
-      child: const MyApp(),
+      child: const KosFinderApp(),
     ),
   );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class KosFinderApp extends StatelessWidget {
+  const KosFinderApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Course Data Manager',
+      title: 'KosFinder',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        colorSchemeSeed: Colors.indigo,
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: primaryColor,
-        ),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.white,
-          foregroundColor: Color(0xFF1F2937),
-          elevation: 0,
-        ),
       ),
-      home: const MainScreen(),
+      home: const LoginPage(),
     );
   }
 }
