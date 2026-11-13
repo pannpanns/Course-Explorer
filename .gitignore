@@ -49,3 +49,7 @@ app.*.map.json
 
 #secrets
 .env
+android/app/google-services.json
+lib/firebase_options.dart
+web/firebase-messaging-sw.js
+firebase.json
