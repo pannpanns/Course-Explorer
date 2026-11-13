@@ -3,10 +3,13 @@ import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+import 'app_keys.dart';
 import 'providers/course_provider.dart';
 import 'repositories/course_repository.dart';
 import 'services/course_data_source.dart';
 import 'services/course_supabase_service.dart';
+import 'services/auth_service.dart';
+import 'pages/home_page.dart';
 import 'pages/login_page.dart';
 
 const String studentName = 'Putu Evan Jagadish Satriana';
@@ -22,6 +25,16 @@ Future<void> main() async {
     url: dotenv.env['SUPABASE_URL']!,
     publishableKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
+
+  Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+    debugPrint('Auth event: ${data.event}');
+    if (data.event == AuthChangeEvent.signedOut) {
+      navigatorKey.currentState?.pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const LoginPage()),
+        (route) => false,
+      );
+    }
+  });
 
   final CourseDataSource dataSource = CourseSupabaseService();
   final repository = CourseRepository(dataSource);
@@ -46,7 +59,11 @@ class KosFinderApp extends StatelessWidget {
         colorSchemeSeed: Colors.indigo,
         useMaterial3: true,
       ),
-      home: const LoginPage(),
+      navigatorKey: navigatorKey,
+      scaffoldMessengerKey: messengerKey,
+      home: AuthService.instance.isLoggedIn
+          ? const HomePage()
+          : const LoginPage(),
     );
   }
 }
